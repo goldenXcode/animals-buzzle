@@ -1,0 +1,9 @@
+<resources>
+
+    <string name="app_name">Звериные баззлы</string>
+    <string name="menu_settings">Settings</string>
+    <string name="title_activity_freeman_field">Звериные баззлы</string>
+    <string name="title_start_button">Play</string>
+    <string name="title_exit_button">Exit</string>
+    
+</resources>
