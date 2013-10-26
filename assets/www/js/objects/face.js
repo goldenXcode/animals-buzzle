@@ -4,8 +4,7 @@ Crafty.c('Face', {
         this.requires("Canvas");
         this.requires("bear");
         this.requires("SpriteAnimation");
-
-        this.requires("Unit");
+        this.requires("Tween")
 
         this.attr({x: 0, y: 0});
         this.animate("walk_left", 0, 0, 3);
@@ -22,7 +21,13 @@ Crafty.c('Face', {
         });
         this.bind("Stopped", function(e) {
             console.log("Stopped x=" + e.x + ", y=" + e.y);
-            self.tween({x: self.x + e.x, y: self.y + e.y}, 20)
+            self.tween({
+                x: self.x + e.x, 
+                y: self.y + e.y
+            }, 20)
+            self.bind('TweenEnd', function () {
+                Game.touchManager.checkBounds(self);
+            })
         });
     },
 

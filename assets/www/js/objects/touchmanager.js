@@ -1,7 +1,6 @@
-Crafty.c('Unit', {
+Crafty.c('TouchManager', {
     init: function() {
         this.requires("2D");
-        this.requires("Tween")
 
         this.inMotion = false
         this.direction = ''
@@ -11,9 +10,10 @@ Crafty.c('Unit', {
             lastPos: {
                 x: 0, 
                 y: 0
-            } 
+            }
         });
         var self = this
+        Game.touchManager = self
         self.outOfBounds = function (e) {
             if (e.x < Settings.left)
                 return true;

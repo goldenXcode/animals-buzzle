@@ -6,6 +6,8 @@ Crafty.scene("main", function() {
     */
     console.log("Main scene started!")
 
+    Crafty.e("TouchManager");
+
     for(var i = 0; i*Settings.poligon < Settings.width; i++) {
         console.log("Main scene ground")
         for(var j = 0; j*Settings.poligon < Settings.height; j++) {

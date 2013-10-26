@@ -22,7 +22,7 @@ var Game = {
 var AllScripts = [
     // objects
     'js/objects/face',
-    'js/objects/unit',
+    'js/objects/touchmanager',
     // scenes
     'js/scenes/loading',
     'js/scenes/main',
