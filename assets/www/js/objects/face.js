@@ -43,8 +43,38 @@ Crafty.c('Face', {
             }, 20)
             self.bind('TweenEnd', function () {
                 Game.touchManager.checkBounds(self);
+                self.checkFriends();
+                self.unbind('TweenEnd');
             })
         });
+    },
+
+    getNearest: function () {
+        var result = [];
+        var self = this;
+        Game.objects.forEach(function(object) {
+            if (Math.abs(self.x - object.x) <= Settings.poligon + 3) {
+                if (Math.abs(self.y - object.y) <= Settings.poligon + 3) {
+                    if (self.animalType == object.animalType) {
+                        result.push(object);
+                    }
+                }
+            }
+        });
+        return result;
+    },
+
+    checkFriends: function() {
+        var self = this;
+        Game.objects.forEach(function(object) {
+            var nearest = object.getNearest();
+            console.log('type=' + object.animalType + ' count=' + nearest.length)
+            if (nearest.length >= 3) {
+                nearest.forEach(function (obj) {
+                    obj.tween({alpha: 0.0}, 30);
+                });
+            }
+        })
     },
 
     clear: function() {
