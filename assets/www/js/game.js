@@ -44,6 +44,33 @@ require(AllScripts, function() {
     Crafty.sprite(Settings.poligon, "images/bear.png", {
         bear: [0,0]
     });
+    // подгружаем спрайт
+    Crafty.sprite(Settings.poligon, "images/bird.png", {
+        bird: [0,0]
+    });
+    // подгружаем спрайт
+    Crafty.sprite(Settings.poligon, "images/bug1.png", {
+        bug1: [0,0]
+    });
+    // подгружаем спрайт
+    Crafty.sprite(Settings.poligon, "images/bug2.png", {
+        bug2: [0,0]
+    });
+    // подгружаем спрайт
+    Crafty.sprite(Settings.poligon, "images/frog1.png", {
+        frog1: [0,0]
+    });
+    // подгружаем спрайт
+    Crafty.sprite(Settings.poligon, "images/frog2.png", {
+        frog2: [0,0]
+    });
+
+    Game.sprites = [
+        'bear',
+        'bird',
+        'bug1',
+        'frog1'
+    ]
 
     var isPhoneGapUse = false;
     if (isPhoneGapUse) {
