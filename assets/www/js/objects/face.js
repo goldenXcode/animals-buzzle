@@ -53,15 +53,30 @@ Crafty.c('Face', {
         var result = [];
         var self = this;
         Game.objects.forEach(function(object) {
-            if (Math.abs(self.x - object.x) <= Settings.poligon + 3) {
-                if (Math.abs(self.y - object.y) <= Settings.poligon + 3) {
-                    if (self.animalType == object.animalType) {
-                        result.push(object);
+            var dx = Math.abs(self.x - object.x);
+            if (dx <= Settings.poligon) {
+                var dy = Math.abs(self.y - object.y);
+                if (dy <= Settings.poligon) {
+                    if (!dy || !dx) {
+                        if (self.animalType == object.animalType) {
+                            result.push(object);
+                        }
                     }
                 }
             }
         });
         return result;
+    },
+
+    remove: function (obj) {
+        obj.tween({alpha: 0.0}, 30);
+        obj.bind('TweenEnd', function () {
+            var index = Game.objects.indexOf(obj);
+            if (index > 0) {
+                Game.objects.splice(Game.objects.indexOf(obj), 1);
+                console.log('Game.objects=' + Game.objects.length)
+            }
+        })
     },
 
     checkFriends: function() {
@@ -70,9 +85,7 @@ Crafty.c('Face', {
             var nearest = object.getNearest();
             console.log('type=' + object.animalType + ' count=' + nearest.length)
             if (nearest.length >= 3) {
-                nearest.forEach(function (obj) {
-                    obj.tween({alpha: 0.0}, 30);
-                });
+                nearest.forEach(self.remove)
             }
         })
     },
