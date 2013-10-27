@@ -20,7 +20,7 @@ Crafty.c('Face', {
 
         var self = this;
 
-        self.inMotion = false;
+        self.isBusy = false;
         self.animateTimer = function() {
             setTimeout(function() {
                 self.animate("walk_left", 20, 1);
@@ -32,26 +32,23 @@ Crafty.c('Face', {
         this.bind("MovedHorizontal", function(e) {
             console.log("MovedHorizontal x=" + e.x + ", y=" + e.y);
             self.shift(e.x, 0);
-            self.inMotion = true;
+            self.busy();
         });
 
         this.bind("MovedVertical", function(e) {
-            console.log("MovedVertical x=" + e.x + ", y=" + e.y);
+            console.log("MovedVertical x=" + e.x + ", y=" + e.y + ', ' + self.isBusy);
             self.shift(0, e.y);
-            self.inMotion = true;
+            self.busy();
         });
 
         this.bind("Stopped", function(e) {
             console.log("Stopped x=" + e.x + ", y=" + e.y);
-            self.tween({
-                x: self.x + e.x,
-                y: self.y + e.y
-            }, 20)
-            self.checkStop()
+            self.busy();
+            self.checkStop(e)
         });
     },
 
-    checkStop: function() {
+    checkStop: function(e) {
         var self = this;
         self.bind('TweenEnd', function() {
             var dx = (self.x - Settings.left) % Settings.poligon;
@@ -64,14 +61,20 @@ Crafty.c('Face', {
                 self.tween({
                     x: self.x - dx,
                     y: self.y - dy
-                }, 20)
+                }, 2)
             } else {
                 Game.touchManager.checkBounds(self);
-                self.checkFriends();
-                self.unbind('TweenEnd');
-                self.inMotion = false;
+                
+                self.isBusy = false;
+                Game.gameManager.update();
+
+                console.log('on check stop')
             }
         });
+        self.tween({
+            x: self.x + e.x,
+            y: self.y + e.y
+        }, 10)
     },
 
     isNearest: function(object) {
@@ -81,7 +84,7 @@ Crafty.c('Face', {
         if (dx <= Settings.poligon) {
             if (dy <= Settings.poligon) {
                 if (!dy || !dx) {
-                    return self.animalType == object.animalType;
+                    return !object.isBusy && self.animalType == object.animalType;
                 }
             }
         }
@@ -98,40 +101,26 @@ Crafty.c('Face', {
         return result;
     },
 
-    remove: function(obj) {
-        obj.inMotion = true;
-        obj.tween({
-            alpha: 0.0
-        }, 30);
+    remove: function() {
+        var obj = this;
+        console.log('remove')
+        obj.busy();
         obj.bind('TweenEnd', function() {
             var index = Game.objects.indexOf(obj);
             if (index >= 0) {
                 Game.objects.splice(Game.objects.indexOf(obj), 1);
                 console.log('Game.objects=' + Game.objects.length)
             }
-            var index = Game.objects.indexOf(obj);
-            if (index >= 0) {
-                Game.objects.splice(Game.objects.indexOf(obj), 1);
-                console.log('Game.objects=' + Game.objects.length)
-            }
-            obj.inMotion = false;
-        })
+            console.log('Remove')
+            Game.gameManager.update();
+        });
+        obj.tween({
+            alpha: 0.0
+        }, 20);
     },
 
-    checkFriends: function() {
-        var self = this;
-        Game.objects.forEach(function(object) {
-            var nearest = object.getNearest();
-            console.log('type=' + object.animalType + ' count=' + nearest.length)
-            if (nearest.length >= 3) {
-                nearest.forEach(self.remove)
-                return true;
-            }
-        })
-        return false;
-    },
-
-    isInMotion: function () {
-        return this.inMotion;
+    busy: function () {
+        Game.gameManager.isBusy = true;
+        this.isBusy = true;
     }
 });

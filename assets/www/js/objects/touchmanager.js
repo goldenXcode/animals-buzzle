@@ -2,8 +2,9 @@ Crafty.c('TouchManager', {
     init: function() {
         this.requires("2D");
 
-        this.inMotion = false
-        this.direction = ''
+        this.inMotion = false;
+        this.direction = '';
+        this.objects = [];
 
         this.attr({x: 0, y: 0, z: 1});
         this.attr({
@@ -45,18 +46,22 @@ Crafty.c('TouchManager', {
         self.setDirection = function (e) {
             var cdx = Math.abs(e.x - self.startPos.x);
             var cdy = Math.abs(e.y - self.startPos.y);
-            if (Math.max(cdx, cdy) < 10)
+            if (Math.max(cdx, cdy) < 5)
                 throw "cantCalcDirectionError";
 
             if (cdx > cdy) {
                 self.direction = 'Horizontal';
                 self.isAction = function (object) {
-                    return object.y < self.startPos.y && object.y + object.h > self.startPos.y
+                    var result = object.y < self.startPos.y;
+                    result = result && (object.y + object.h > self.startPos.y)
+                    return result;                    
                 }
             } else {
                 self.direction = 'Vertical';
                 self.isAction = function (object) {
-                    return object.x < self.startPos.x && object.x + object.w > self.startPos.x
+                    var result = object.x < self.startPos.x;
+                    result = result && (object.x + object.w > self.startPos.x);
+                    return result;
                 }
             }
         }
@@ -74,14 +79,19 @@ Crafty.c('TouchManager', {
             self.direction = '';
             self.inMotion = true;
         }
-        self.motion = function (e) {
-            if (!self.inMotion)
-                return
-                    
+        self.motion = function (e) {         
+            if (!self.inMotion)        
+                return;
             var dx = e.x - self.lastPos.x;
             var dy = e.y - self.lastPos.y;
 
             if (self.direction == '') {
+                if (Game.gameManager.isBusy) {
+                    console.log('Game.gameManager.isBusy!')
+                    self.direction = '';
+                    self.inMotion = false;
+                    return
+                }
                 self.setDirection(e)
             }
 
@@ -134,6 +144,8 @@ Crafty.c('TouchManager', {
         Crafty.e("2D, DOM, Color, Mouse")
             .attr({ w: 10000, h: 10000 })
             .bind('MouseDown', function(e) {
+                if (Game.gameManager.isBusy)
+                    return
                 console.log("Mouse down: x=" + e + ", y=" + e.y);
                 try {
                     if (!self.outOfBounds(e)) {
@@ -144,7 +156,7 @@ Crafty.c('TouchManager', {
                 }
             })
             .bind('MouseMove', function(e) {
-                console.log("Mouse move: x=" + e.x + ", y=" + e.y);
+                //console.log("Mouse move: x=" + e.x + ", y=" + e.y);
                 try {
                     if (self.outOfBounds(e)) {
                         self.stopMotion(self.lastPos);

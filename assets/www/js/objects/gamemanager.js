@@ -9,40 +9,72 @@ Crafty.c('GameManager', {
         var self = this;
         Game.gameManager = self;
 
+        self.isBusy = false;
+
         self.mainTimer = function() {
             setTimeout(function() {
-                if (self.isAllObjectStopped()) {
-                    console.log('All object was stopped!');
-                    self.gravity();
-                }
                 self.mainTimer();
             }, 500);
         }
         self.mainTimer();
     },
 
-    isAllObjectStopped: function () {
+    update: function () {
+        var self = this;
+        if (self.isAllObjectStopped()) {
+            console.log('All object was stopped!');
+            if (!self.checkFriends()) {
+                if (!self.gravity()) {
+                    self.isBusy = Game.objects.length < 20;
+                    console.log('Reset gameManager state');
+                }
+            }
+        }
+    },
+    checkFriends: function() {
+        var result = false;
         Game.objects.forEach(function(object) {
-            if (object.isInMotion()) {
-                return false;
+            var nearest = object.getNearest();
+            //console.log('type=' + object.animalType + ' count=' + nearest.length)
+            if (nearest.length >= 3) {
+                nearest.forEach(function (obj) {
+                    obj.remove();
+                })
+                result = true;
+            }
+        })
+        return result;
+    },
+
+    isAllObjectStopped: function () {
+        var result = true;
+        Game.objects.forEach(function(object) {
+            if (object.isBusy) {
+                result = false;
             }
         });
-        return true;
+        return result;
     },
 
     gravity: function () {
         var self = this;
+        var result = false;
+
+        if  (Game.objects.length >= 6 * 6)
+            return false
 
         var x = Settings.left;
         while (x < Settings.right) {
             var column = self.getColumn(x);
 
             if (column.length < 6) {
+                result = true;
                 self.fillColumn(column, x);
                 self.dropItemsFromColumn(column, x);
             }
             x += Settings.poligon;
         }
+        return result;
     },
 
     dropItemsFromColumn: function(column) {
