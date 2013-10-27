@@ -32,10 +32,11 @@ Crafty.c('GameManager', {
             }
         }
     },
+    
     checkFriends: function() {
         var result = false;
-        if (Game.objects.length < 6 * 6)
-            return false;
+        //if (Game.objects.length < 6 * 6)
+        //    return false;
         Game.objects.forEach(function(object) {
             var nearest = object.getNearest();
             //console.log('type=' + object.animalType + ' count=' + nearest.length)
@@ -43,6 +44,18 @@ Crafty.c('GameManager', {
                 nearest.forEach(function (obj) {
                     obj.remove();
                 })
+                result = true;
+            }
+        })
+        return result;
+    },
+    
+    isHasFriends: function() {
+        var result = false;
+        Game.objects.forEach(function(object) {
+            var nearest = object.getNearest();
+            //console.log('type=' + object.animalType + ' count=' + nearest.length)
+            if (nearest.length >= 3) {
                 result = true;
             }
         })
@@ -85,7 +98,7 @@ Crafty.c('GameManager', {
         while (y >= Settings.top) {
             var item = column.pop();
             if (item) {
-                item.trigger('Stopped', {x: 0, y: y - item.y});
+                item.trigger('StoppedVertical', {x: 0, y: y - item.y});
             }
             y -= Settings.poligon;
         }

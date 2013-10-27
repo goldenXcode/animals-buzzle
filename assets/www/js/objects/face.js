@@ -30,20 +30,32 @@ Crafty.c('Face', {
 
         this.bind("MovedHorizontal", function(e) {
             //console.log("MovedHorizontal x=" + e.x + ", y=" + e.y);
-            self.shift(e.x, 0);
+            self.shift(Math.floor(e.x), 0);
             self.busy();
         });
 
         this.bind("MovedVertical", function(e) {
             //console.log("MovedVertical x=" + e.x + ", y=" + e.y + ', ' + self.isBusy);
-            self.shift(0, e.y);
+            self.shift(0, Math.floor(e.y));
             self.busy();
         });
 
-        this.bind("Stopped", function(e) {
+        this.bind("StoppedHorizontal", function(e) {
             //console.log("Stopped x=" + e.x + ", y=" + e.y);
             self.busy();
-            self.checkStop(e)
+            self.checkStop({
+                x: e.x,
+                y: 0
+            })
+        });
+
+        this.bind("StoppedVertical", function(e) {
+            //console.log("Stopped x=" + e.x + ", y=" + e.y);
+            self.busy();
+            self.checkStop({
+                x: 0,
+                y: e.y
+            })
         });
     },
 
@@ -64,13 +76,14 @@ Crafty.c('Face', {
     checkStop: function(e) {
         var self = this;
         self.bind('TweenEnd', function() {
+            Game.touchManager.checkBounds(self);
             var dx = self.getOffsetXForPrecisePosition();
             var dy = self.getOffsetYForPrecisePosition();
             if (dx != 0 || dy != 0) {
                 //console.log('checkStop dx=' + dx + ', dy=' + dy)
                 self.tween({
-                    x: self.x - dx,
-                    y: self.y - dy
+                    x: Math.floor(self.x - dx),
+                    y: Math.floor(self.y - dy)
                 }, 2)
             } else {
                 Game.touchManager.checkBounds(self);
@@ -79,8 +92,8 @@ Crafty.c('Face', {
             }
         });
         self.tween({
-            x: self.x + e.x,
-            y: self.y + e.y
+            x: Math.floor(self.x + e.x),
+            y: Math.floor(self.y + e.y)
         }, 10)
     },
 
@@ -88,9 +101,9 @@ Crafty.c('Face', {
         var self = this;
         var dx = Math.abs(self.x - object.x);
         var dy = Math.abs(self.y - object.y);
-        if (dx <= Settings.poligon + 10) {
-            if (dy <= Settings.poligon + 10) {
-                if (dy < 10 || dx < 10) {
+        if (dx <= Settings.poligon) {
+            if (dy <= Settings.poligon) {
+                if (dy < Settings.poligon/2 || dx < Settings.poligon/2) {
                     return self.animalType == object.animalType;
                 }
             }

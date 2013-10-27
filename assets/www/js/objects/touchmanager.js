@@ -29,18 +29,16 @@ Crafty.c('TouchManager', {
             return false;
         }
         self.checkBounds = function (object) {
-            var maxX = Settings.width;
-            if (object.x < 0) {
+            if (object.x < Settings.left - Settings.poligon/2) {
                 object.x += Settings.width;
             }
-            if (object.x > maxX) {
+            if (object.x > Settings.right - Settings.poligon/2) {
                 object.x -= Settings.width;
             }
-            var maxY = Settings.height;
-            if (object.y > maxY) {
+            if (object.y > Settings.bottom - Settings.poligon/2) {
                 object.y -= Settings.height;
             }
-            if (object.y < 0) {
+            if (object.y < Settings.top - Settings.poligon/2) {
                 object.y += Settings.height;
             }
         }
@@ -94,6 +92,12 @@ Crafty.c('TouchManager', {
                     return
                 }
                 self.setDirection(e)
+                self.attr({
+                    startPos: {
+                        x: e.x, 
+                        y: e.y
+                    }
+                })
             }
 
             self.attr({
@@ -112,30 +116,6 @@ Crafty.c('TouchManager', {
                     self.checkBounds(object);
                 }
             })
-        }
-        self.stopMotion = function (e) {
-            if (!self.inMotion)
-                return
-
-            var dx = e.x - self.lastPos.x;
-            var dy = e.y - self.lastPos.y;
-            
-            if (self.direction == 'Horizontal')
-                dy = 0;
-            else
-                dx = 0;
-
-            //console.log("Stop move: x=" + dx + ", y=" + dy);
-            Game.objects.forEach(function(object) {
-                if (self.isAction(object)) {
-                    object.trigger('Stopped', {
-                        x: -dx, 
-                        y: -dy
-                    })
-                }
-            })
-            self.direction = '';
-            self.inMotion = false;
         }
         Crafty.e("2D, DOM, Color, Mouse")
             .attr({ w: 10000, h: 10000 })
@@ -171,6 +151,45 @@ Crafty.c('TouchManager', {
                 }
             })
 
+    },
+
+    stopMotion: function (e) {
+        var self = this;
+        if (!self.inMotion)
+            return
+        if (!Game.gameManager.isHasFriends()) {
+            self.revert();
+        } else {
+            self.stop(e);
+        }
+    },
+    
+    revert: function() {
+        var self = this;
+        var dx = 2*self.lastPos.x - self.startPos.x;
+        var dy = 2*self.lastPos.y - self.startPos.y;
+        this.stop({
+            x: dx, 
+            y: dy
+        });
+    },
+
+    stop: function (e) {
+        var self = this;
+        var dx = e.x - self.lastPos.x;
+        var dy = e.y - self.lastPos.y;
+        
+        //console.log("Stop move: x=" + dx + ", y=" + dy);
+        Game.objects.forEach(function(object) {
+            if (self.isAction(object)) {
+                object.trigger('Stopped' + self.direction, {
+                    x: -dx, 
+                    y: -dy
+                })
+            }
+        })
+        self.direction = '';
+        self.inMotion = false;
     },
     
     isCanMoveTo: function(x, y) {
