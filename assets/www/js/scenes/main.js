@@ -13,15 +13,10 @@ Crafty.scene("main", function() {
         console.log("Main scene ground")
         for(var j = 0; j*Settings.poligon < Settings.height; j++) {
     	    console.log("Main scene ground")
-            var obj = Crafty.e("Face").attr({
-                x: Settings.left + i * Settings.poligon,
-                y: Settings.top + j * Settings.poligon,
-                w: Settings.poligon,
-                h: Settings.poligon
-            });
-
-            Game.objects.push(obj);
-
+            Game.gameManager.createItem(
+                Settings.left + i * Settings.poligon,
+                Settings.top + j * Settings.poligon
+                )
         }
     }
 

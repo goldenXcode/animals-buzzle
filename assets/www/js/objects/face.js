@@ -99,15 +99,22 @@ Crafty.c('Face', {
     },
 
     remove: function(obj) {
+        obj.inMotion = true;
         obj.tween({
             alpha: 0.0
         }, 30);
         obj.bind('TweenEnd', function() {
             var index = Game.objects.indexOf(obj);
-            if (index > 0) {
+            if (index >= 0) {
                 Game.objects.splice(Game.objects.indexOf(obj), 1);
                 console.log('Game.objects=' + Game.objects.length)
             }
+            var index = Game.objects.indexOf(obj);
+            if (index >= 0) {
+                Game.objects.splice(Game.objects.indexOf(obj), 1);
+                console.log('Game.objects=' + Game.objects.length)
+            }
+            obj.inMotion = false;
         })
     },
 
@@ -126,11 +133,5 @@ Crafty.c('Face', {
 
     isInMotion: function () {
         return this.inMotion;
-    },
-
-    clear: function() {
-        this.removeComponent('Ground');
-        this._visible = false;
-        this.destroy();
     }
 });
