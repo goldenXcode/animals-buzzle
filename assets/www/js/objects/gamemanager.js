@@ -26,7 +26,7 @@ Crafty.c('GameManager', {
             //console.log('All object was stopped!');
             if (!self.checkFriends()) {
                 if (!self.gravity()) {
-                    self.isBusy = Game.objects.length < 20;
+                    self.isBusy = false;
                     //console.log('Reset gameManager state');
                 }
             }
@@ -35,11 +35,8 @@ Crafty.c('GameManager', {
     
     checkFriends: function() {
         var result = false;
-        //if (Game.objects.length < 6 * 6)
-        //    return false;
         Game.objects.forEach(function(object) {
             var nearest = object.getNearest();
-            //console.log('type=' + object.animalType + ' count=' + nearest.length)
             if (nearest.length >= 3) {
                 nearest.forEach(function (obj) {
                     obj.remove();
@@ -54,7 +51,6 @@ Crafty.c('GameManager', {
         var result = false;
         Game.objects.forEach(function(object) {
             var nearest = object.getNearest();
-            //console.log('type=' + object.animalType + ' count=' + nearest.length)
             if (nearest.length >= 3) {
                 result = true;
             }
@@ -76,9 +72,6 @@ Crafty.c('GameManager', {
         var self = this;
         var result = false;
 
-        if  (Game.objects.length >= 6 * 6)
-            return false
-
         var x = Settings.left;
         while (x < Settings.right) {
             var column = self.getColumn(x);
@@ -98,7 +91,10 @@ Crafty.c('GameManager', {
         while (y >= Settings.top) {
             var item = column.pop();
             if (item) {
-                item.trigger('StoppedVertical', {x: 0, y: y - item.y});
+                item.trigger('StoppedVertical', {
+                    x: 0, 
+                    y: y - item.y
+                });
             }
             y -= Settings.poligon;
         }

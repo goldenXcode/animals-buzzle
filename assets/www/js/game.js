@@ -24,6 +24,7 @@ var AllScripts = [
     'js/objects/face',
     'js/objects/touchmanager',
     'js/objects/gamemanager',
+    'js/objects/facesprite',
     // scenes
     'js/scenes/loading',
     'js/scenes/main',

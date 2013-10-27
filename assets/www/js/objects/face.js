@@ -2,31 +2,11 @@ Crafty.c('Face', {
     init: function() {
         this.requires("2D");
         this.requires("Canvas");
-        this.requires("SpriteAnimation");
+        this.requires("FaceSprite");
         this.requires("Tween")
 
-        function rnd(max) {
-            return Math.floor(Math.random() * 1000 * 1000) % max;
-        }
-        this.animalType = rnd(Game.sprites.length);
-        this.requires(Game.sprites[this.animalType]);
-
-        this.attr({
-            x: 0,
-            y: 0
-        });
-        this.animate("walk_left", 0, 0, 3);
-
         var self = this;
-
         self.isBusy = false;
-        self.animateTimer = function() {
-            setTimeout(function() {
-                self.animate("walk_left", 20, 1);
-                self.animateTimer();
-            }, rnd(15000) + 4000);
-        }
-        self.animateTimer();
 
         this.bind("MovedHorizontal", function(e) {
             //console.log("MovedHorizontal x=" + e.x + ", y=" + e.y);
@@ -76,17 +56,15 @@ Crafty.c('Face', {
     checkStop: function(e) {
         var self = this;
         self.bind('TweenEnd', function() {
-            Game.touchManager.checkBounds(self);
+            self.checkBounds();
             var dx = self.getOffsetXForPrecisePosition();
             var dy = self.getOffsetYForPrecisePosition();
             if (dx != 0 || dy != 0) {
-                //console.log('checkStop dx=' + dx + ', dy=' + dy)
                 self.tween({
                     x: Math.floor(self.x - dx),
                     y: Math.floor(self.y - dy)
                 }, 2)
             } else {
-                Game.touchManager.checkBounds(self);
                 self.isBusy = false;
                 Game.gameManager.update();
             }
@@ -115,7 +93,6 @@ Crafty.c('Face', {
         var result = [];
         var self = this;
         Game.objects.forEach(function(object) {
-            //console.log('object x=' + object.x + ', y=' + object.y)
             if (self.isNearest(object)) {
                 result.push(object);
             }
@@ -125,20 +102,32 @@ Crafty.c('Face', {
 
     remove: function() {
         var obj = this;
-        console.log('remove')
         obj.busy();
         obj.bind('TweenEnd', function() {
             var index = Game.objects.indexOf(obj);
             if (index >= 0) {
-                Game.objects.splice(Game.objects.indexOf(obj), 1);
-                console.log('Game.objects=' + Game.objects.length)
+                Game.objects.splice(index, 1);
             }
-            console.log('Remove')
             Game.gameManager.update();
         });
         obj.tween({
             alpha: 0.0
         }, 20);
+    },
+
+    checkBounds: function () {
+        if (this.x < Settings.left - Settings.poligon/2) {
+            this.x += Settings.width;
+        }
+        if (this.x > Settings.right - Settings.poligon/2) {
+            this.x -= Settings.width;
+        }
+        if (this.y > Settings.bottom - Settings.poligon/2) {
+            this.y -= Settings.height;
+        }
+        if (this.y < Settings.top - Settings.poligon/2) {
+            this.y += Settings.height;
+        }
     },
 
     busy: function () {
