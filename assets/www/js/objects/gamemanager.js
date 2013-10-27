@@ -33,6 +33,8 @@ Crafty.c('GameManager', {
     },
     checkFriends: function() {
         var result = false;
+        if (Game.objects.length < 6 * 6)
+            return false;
         Game.objects.forEach(function(object) {
             var nearest = object.getNearest();
             //console.log('type=' + object.animalType + ' count=' + nearest.length)

@@ -30,19 +30,19 @@ Crafty.c('Face', {
         self.animateTimer();
 
         this.bind("MovedHorizontal", function(e) {
-            console.log("MovedHorizontal x=" + e.x + ", y=" + e.y);
+            //console.log("MovedHorizontal x=" + e.x + ", y=" + e.y);
             self.shift(e.x, 0);
             self.busy();
         });
 
         this.bind("MovedVertical", function(e) {
-            console.log("MovedVertical x=" + e.x + ", y=" + e.y + ', ' + self.isBusy);
+            //console.log("MovedVertical x=" + e.x + ", y=" + e.y + ', ' + self.isBusy);
             self.shift(0, e.y);
             self.busy();
         });
 
         this.bind("Stopped", function(e) {
-            console.log("Stopped x=" + e.x + ", y=" + e.y);
+            //console.log("Stopped x=" + e.x + ", y=" + e.y);
             self.busy();
             self.checkStop(e)
         });
@@ -51,9 +51,10 @@ Crafty.c('Face', {
     checkStop: function(e) {
         var self = this;
         self.bind('TweenEnd', function() {
-            var dx = (self.x - Settings.left) % Settings.poligon;
-            var dy = (self.y - Settings.top) % Settings.poligon;
+            var dx = Math.floor(self.x - Settings.left) % Settings.poligon;
+            var dy = Math.floor(self.y - Settings.top) % Settings.poligon;
             if (dx != 0 || dy != 0) {
+                console.log('checkStop dx=' + dx + ', dy=' + dy)
                 if (dx > Settings.poligon / 2)
                     dx = dx - Settings.poligon;
                 if (dy > Settings.poligon / 2)
