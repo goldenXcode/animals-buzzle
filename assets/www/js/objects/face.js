@@ -17,7 +17,6 @@ Crafty.c('Face', {
         });
         this.animate("walk_left", 0, 0, 3);
 
-
         var self = this;
 
         self.isBusy = false;
@@ -48,28 +47,35 @@ Crafty.c('Face', {
         });
     },
 
+    getOffsetXForPrecisePosition: function () {
+        var dx = Math.floor(this.x - Settings.left) % Settings.poligon;
+        if (dx > Settings.poligon / 2)
+            dx = dx - Settings.poligon;
+        return dx;
+    },
+
+    getOffsetYForPrecisePosition: function () {
+        var dy = Math.floor(this.y - Settings.top) % Settings.poligon;
+        if (dy > Settings.poligon / 2)
+            dy = dy - Settings.poligon;
+        return dy;
+    },
+
     checkStop: function(e) {
         var self = this;
         self.bind('TweenEnd', function() {
-            var dx = Math.floor(self.x - Settings.left) % Settings.poligon;
-            var dy = Math.floor(self.y - Settings.top) % Settings.poligon;
+            var dx = self.getOffsetXForPrecisePosition();
+            var dy = self.getOffsetYForPrecisePosition();
             if (dx != 0 || dy != 0) {
-                console.log('checkStop dx=' + dx + ', dy=' + dy)
-                if (dx > Settings.poligon / 2)
-                    dx = dx - Settings.poligon;
-                if (dy > Settings.poligon / 2)
-                    dy = dy - Settings.poligon;
+                //console.log('checkStop dx=' + dx + ', dy=' + dy)
                 self.tween({
                     x: self.x - dx,
                     y: self.y - dy
                 }, 2)
             } else {
                 Game.touchManager.checkBounds(self);
-                
                 self.isBusy = false;
                 Game.gameManager.update();
-
-                console.log('on check stop')
             }
         });
         self.tween({
@@ -82,10 +88,10 @@ Crafty.c('Face', {
         var self = this;
         var dx = Math.abs(self.x - object.x);
         var dy = Math.abs(self.y - object.y);
-        if (dx <= Settings.poligon) {
-            if (dy <= Settings.poligon) {
-                if (!dy || !dx) {
-                    return !object.isBusy && self.animalType == object.animalType;
+        if (dx <= Settings.poligon + 10) {
+            if (dy <= Settings.poligon + 10) {
+                if (dy < 10 || dx < 10) {
+                    return self.animalType == object.animalType;
                 }
             }
         }
@@ -96,8 +102,10 @@ Crafty.c('Face', {
         var result = [];
         var self = this;
         Game.objects.forEach(function(object) {
-            if (self.isNearest(object))
+            //console.log('object x=' + object.x + ', y=' + object.y)
+            if (self.isNearest(object)) {
                 result.push(object);
+            }
         });
         return result;
     },

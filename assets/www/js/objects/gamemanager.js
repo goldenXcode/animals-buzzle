@@ -13,6 +13,7 @@ Crafty.c('GameManager', {
 
         self.mainTimer = function() {
             setTimeout(function() {
+                self.update();
                 self.mainTimer();
             }, 500);
         }
@@ -22,11 +23,11 @@ Crafty.c('GameManager', {
     update: function () {
         var self = this;
         if (self.isAllObjectStopped()) {
-            console.log('All object was stopped!');
+            //console.log('All object was stopped!');
             if (!self.checkFriends()) {
                 if (!self.gravity()) {
                     self.isBusy = Game.objects.length < 20;
-                    console.log('Reset gameManager state');
+                    //console.log('Reset gameManager state');
                 }
             }
         }
@@ -117,6 +118,7 @@ Crafty.c('GameManager', {
     },
 
     createItem: function (x, y) {
+        console.log('Game.createItem')
         var obj = Crafty.e("Face").attr({
             x: x,
             y: y,
