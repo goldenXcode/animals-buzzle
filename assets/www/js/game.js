@@ -25,6 +25,10 @@ var AllScripts = [
     'js/objects/touchmanager',
     'js/objects/gamemanager',
     'js/objects/facesprite',
+    'js/objects/background',
+    'js/objects/frontground',
+    'js/objects/zabor',
+    'js/objects/grass',
     // scenes
     'js/scenes/loading',
     'js/scenes/main',
@@ -65,6 +69,19 @@ require(AllScripts, function() {
     // подгружаем спрайт
     Crafty.sprite(Settings.poligon, "images/pig.png", {
         pig: [0,0]
+    });
+
+    Crafty.sprite(Settings.poligon, "images/sky.png", {
+        background: [0,0]
+    });
+    Crafty.sprite("images/skyframe.png", {
+        frontgroundimg: [0,0]
+    });
+    Crafty.sprite(100, 400, "images/zabor.png", {
+        zabor: [0,0]
+    });
+    Crafty.sprite(258, 78, "images/grass.png", {
+        grass: [0,0]
     });
 
     Game.sprites = [

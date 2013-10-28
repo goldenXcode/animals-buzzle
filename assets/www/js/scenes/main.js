@@ -1,11 +1,13 @@
 Crafty.scene("main", function() {
 
-    /*var width = Math.min(Crafty.DOM.window.width, Crafty.DOM.window.height)
-    Settings.width = width;
-    Settings.height = width;
-    */
+    Settings.left = Crafty.viewport.width/2 - Settings.width/2
+    Settings.top = Crafty.viewport.height/2 - Settings.height/2
+    Settings.right = Settings.left + Settings.width
+    Settings.bottom = Settings.top + Settings.height
     console.log("Main scene started!")
 
+    Crafty.e("Background");
+    //Crafty.e("Frontground");
     Crafty.e("TouchManager");
     Crafty.e("GameManager");
 

@@ -1,36 +1,17 @@
 Crafty.scene("loading", function() {
     // меняем цвет фона
-    Crafty.background("yellow");
-    /*Crafty.e("2D, DOM, Text, Image").attr({
-        w: Crafty.DOM.window.width,
-        h: Crafty.DOM.window.height,
-        x: 0,
-        y: 0
-    }).image("images/ground.jpg", "repeat");
+    Crafty.e("Background");
 
-    var splashSizes = [800, 400, 200, 75, 0];
-    var splashSizeIndex = 0;
+    Settings.left = Crafty.viewport.width/2 - Settings.width/2
+    Settings.top = Crafty.viewport.height/2 - Settings.height/2
+    Settings.right = Settings.left + Settings.width
+    Settings.bottom = Settings.top + Settings.height
 
-    while (splashSizes[splashSizeIndex] > Math.min(Crafty.DOM.window.width, Crafty.DOM.window.height)) {
-        splashSizeIndex++;
-	if(splashSizeIndex == splashSizes.length - 1)break;
-    }
+    Crafty.e("2D, DOM, Image").attr({
+        x: Crafty.viewport.width/2 - 300,
+        y: Crafty.viewport.height/2 -300
+    }).image('images/splash.png');
 
-    var imgWidth = splashSizes[splashSizeIndex];
-    var imgHeight = splashSizes[splashSizeIndex];
-
-    // выводим по центру текст
-    var imageX = Crafty.DOM.window.width/2 - imgWidth/2;
-    var imageY = Crafty.DOM.window.height/2 - imgHeight/2;
-    var imgName = "images/splash/digger" + splashSizes[splashSizeIndex] + "x" + splashSizes[splashSizeIndex] + ".png";
-
-    Crafty.e("2D, DOM, Text, Image").attr({
-        w: imgWidth,
-        h: imgHeight,
-        x: imageX,
-        y: imageY
-    }).image(imgName);
-*/
     setTimeout(function() {
         Crafty.scene("main");
     }, 1500);

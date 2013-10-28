@@ -1,11 +1,12 @@
 Crafty.c('GameManager', {
     init: function() {
         this.requires("2D");
+        this.requires("Canvas");
 
         this.inMotion = false
         this.direction = ''
 
-        this.attr({x: 0, y: 0, z: 1});
+        this.attr({x: 0, y: 0});
         var self = this;
         Game.gameManager = self;
 
@@ -132,7 +133,8 @@ Crafty.c('GameManager', {
             x: x,
             y: y,
             w: Settings.poligon,
-            h: Settings.poligon
+            h: Settings.poligon,
+            z: 50
         });
 
         Game.objects.push(obj);

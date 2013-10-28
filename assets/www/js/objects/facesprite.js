@@ -4,10 +4,6 @@ Crafty.c('FaceSprite', {
         this.requires("Canvas");
         this.requires("SpriteAnimation");
 
-        function rnd(max) {
-            return Math.floor(Math.random() * 1000 * 1000) % max;
-        }
-
         this.animalType = rnd(Game.sprites.length);
         this.requires(Game.sprites[this.animalType]);
 

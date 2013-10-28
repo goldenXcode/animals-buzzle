@@ -115,3 +115,6 @@ var TopResults = function (game) {
         return this.add(name, value);
     }
 };
+function rnd(max) {
+    return Math.floor(Math.random() * 1000 * 1000) % max;
+}
