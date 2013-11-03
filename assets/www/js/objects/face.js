@@ -104,11 +104,7 @@ Crafty.c('Face', {
         var obj = this;
         obj.busy();
         obj.bind('TweenEnd', function() {
-            var index = Game.objects.indexOf(obj);
-            if (index >= 0) {
-                Game.objects.splice(index, 1);
-            }
-            Game.gameManager.update();
+            Game.gameManager.removeItem(obj);           
         });
         obj.tween({
             alpha: 0.0
@@ -133,5 +129,12 @@ Crafty.c('Face', {
     busy: function () {
         Game.gameManager.isBusy = true;
         this.isBusy = true;
+    },
+
+    center: function() {
+        return {
+            x: this.x + this.w/2,
+            y: this.y + this.h/2
+        }
     }
 });

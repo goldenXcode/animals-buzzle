@@ -19,6 +19,11 @@ Crafty.c('GameManager', {
             }, 500);
         }
         self.mainTimer();
+
+        self.bind('onMoveVertical', self.onMoveVertical);
+        self.bind('onMoveHorizontal', self.onMoveHorizontal);
+        self.bind('onMoveStopVertical', self.onMoveStopVertical);
+        self.bind('onMoveStopHorizontal', self.onMoveStopHorizontal);
     },
 
     update: function () {
@@ -139,5 +144,93 @@ Crafty.c('GameManager', {
 
         Game.objects.push(obj);
         return obj;
-    }
+    },
+
+    removeItem: function (item) {
+        var index = Game.objects.indexOf(item);
+        if (index >= 0) {
+            Game.objects.splice(index, 1);
+        }
+    },
+
+    isObjectOnColumn: function (column, object) {
+        var columtLeft = column * Settings.poligon + Settings.left;
+        var result = object.center().x > columtLeft;
+        result = result && (object.center().x < columtLeft + Settings.poligon);
+        return result;
+    },
+
+    isObjectOnRow: function (row, object) {
+        var rowTop = row * Settings.poligon + Settings.top;
+        var result = object.center().y > rowTop;
+        result = result && (object.center().y < (rowTop + Settings.poligon));
+        return result;
+    },
+
+    getColumnNumberByScreenPoint: function (point) {
+        return Math.floor((point.x - Settings.left) / Settings.poligon);
+    },
+
+    getRowNumberByScreenPoint: function (point) {
+        return Math.floor((point.y - Settings.top) / Settings.poligon);
+    },
+
+    onMoveVertical: function (touchVector) {
+        var startPoint = {
+            x: touchVector.startX,
+            y: touchVector.startY,
+        };
+        var column = this.getColumnNumberByScreenPoint(startPoint);
+        var self = this;
+        Game.objects.forEach(function(object) {
+            if (self.isObjectOnColumn(column, object)) {
+                object.trigger('MovedVertical', touchVector)
+                object.checkBounds();
+            }
+        })
+    },
+
+    onMoveHorizontal: function (touchVector) {
+        var startPoint = {
+            x: touchVector.startX,
+            y: touchVector.startY,
+        };
+
+        var row = this.getRowNumberByScreenPoint(startPoint);
+        var self = this;
+        Game.objects.forEach(function(object) {
+            if (self.isObjectOnRow(row, object)) {
+                object.trigger('MovedHorizontal', touchVector)
+                object.checkBounds();
+            }
+        })
+    },
+
+    onMoveStopVertical: function (touchVector) {
+        var startPoint = {
+            x: touchVector.startX,
+            y: touchVector.startY,
+        };
+        var column = this.getColumnNumberByScreenPoint(startPoint);
+        var self = this;
+        Game.objects.forEach(function(object) {
+            if (self.isObjectOnColumn(column, object)) {
+                object.trigger('StoppedVertical', touchVector)
+            }
+        })
+    },
+
+    onMoveStopHorizontal: function (touchVector) {
+        var startPoint = {
+            x: touchVector.startX,
+            y: touchVector.startY,
+        };
+        var row = this.getRowNumberByScreenPoint(startPoint);
+        var self = this;
+        Game.objects.forEach(function(object) {
+            if (self.isObjectOnRow(row, object)) {
+                object.trigger('StoppedHorizontal', touchVector)
+            }
+        })
+    },
 });

@@ -80,15 +80,12 @@ Crafty.c('TouchManager', {
         var dx = e.x - self.lastPos.x;
         var dy = e.y - self.lastPos.y;
         
-        //console.log("Stop move: x=" + dx + ", y=" + dy);
-        Game.objects.forEach(function(object) {
-            if (self.isAction(object)) {
-                object.trigger('Stopped' + self.direction, {
-                    x: -dx, 
-                    y: -dy
-                })
-            }
-        })
+        Game.gameManager.trigger('onMoveStop' + self.direction, {
+            x: -dx, 
+            y: -dy,
+            startX: self.startPos.x,
+            startY:  self.startPos.y
+        });
         self.direction = '';
         self.inMotion = false;
     },
@@ -111,21 +108,7 @@ Crafty.c('TouchManager', {
         var cdy = Math.abs(e.y - self.startPos.y);
         if (Math.max(cdx, cdy) < 5)
             throw "cantCalcDirectionError";
-        if (cdx > cdy) {
-            self.direction = 'Horizontal';
-            self.isAction = function (object) {
-                var result = object.y < self.startPos.y;
-                result = result && (object.y + object.h > self.startPos.y)
-                return result;                    
-            }
-        } else {
-            self.direction = 'Vertical';
-            self.isAction = function (object) {
-                var result = object.x < self.startPos.x;
-                result = result && (object.x + object.w > self.startPos.x);
-                return result;
-            }
-        }
+        self.direction = cdx > cdy ? 'Horizontal': 'Vertical';
     },
 
     startMotion: function (e) {
@@ -143,6 +126,7 @@ Crafty.c('TouchManager', {
         self.direction = '';
         self.inMotion = true;
     },
+
     motion: function (e) {         
         var self = this;
         if (!self.inMotion)        
@@ -158,15 +142,12 @@ Crafty.c('TouchManager', {
                 y: e.y
             }
         });
-        Game.objects.forEach(function(object) {
-            if (self.isAction(object)) {
-                object.trigger('Moved' + self.direction, {
-                    x: dx, 
-                    y: dy
-                })
-                object.checkBounds();
-            }
-        })
+        Game.gameManager.trigger('onMove' + self.direction, {
+            x: dx, 
+            y: dy,
+            startX: self.startPos.x,
+            startY:  self.startPos.y
+        });
     },
 
     checkDirection: function (e) {
