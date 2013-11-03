@@ -3,14 +3,12 @@ Crafty.c('GameManager', {
         this.requires("2D");
         this.requires("Canvas");
 
-        this.inMotion = false
-        this.direction = ''
-
-        this.attr({x: 0, y: 0});
         var self = this;
         Game.gameManager = self;
 
         self.isBusy = false;
+        self.object = [];
+
         self.itemsPool = new Array();
         for(var i = 0; i < 100; i++) {
             console.log('create item in pool: ' + self.itemsPool.length)
@@ -45,7 +43,7 @@ Crafty.c('GameManager', {
             //console.log('All object was stopped!');
             if (!self.checkFriends()) {
                 if (!self.gravity()) {
-                    Game.objects.forEach(function(object) {
+                    self.object.forEach(function(object) {
                         object.onUpdate();
                     });
                     self.isBusy = false;
@@ -55,11 +53,22 @@ Crafty.c('GameManager', {
         }
     },
     
+    getNearestItems: function(obj) {
+        var result = [];
+        this.object.forEach(function(object) {
+            if (obj.isNearest(object)) {
+                result.push(object);
+            }
+        });
+        return result;
+    },
+
     checkFriends: function() {
         var result = false;
         var friends = [];
-        Game.objects.forEach(function(object) {
-            var nearest = object.getNearest();
+        var self = this;
+        self.object.forEach(function(object) {
+            var nearest = self.getNearestItems(object);
             if (nearest.length >= 3) {
                 friends = friends.concat(nearest);
                 result = true;
@@ -73,8 +82,9 @@ Crafty.c('GameManager', {
     
     isHasFriends: function() {
         var result = false;
-        Game.objects.forEach(function(object) {
-            var nearest = object.getNearest();
+        var self = this;
+        self.object.forEach(function(object) {
+            var nearest = self.getNearestItems(object);
             if (nearest.length >= 3) {
                 result = true;
             }
@@ -84,7 +94,7 @@ Crafty.c('GameManager', {
 
     isAllObjectStopped: function () {
         var result = true;
-        Game.objects.forEach(function(object) {
+        this.object.forEach(function(object) {
             if (object.isBusy) {
                 result = false;
             }
@@ -144,7 +154,7 @@ Crafty.c('GameManager', {
     getColumn: function (columnNumber) {
         var column = [];
         var self = this;
-        Game.objects.forEach(function(obj) {
+        self.object.forEach(function(obj) {
             if (self.isObjectOnColumn(columnNumber, obj))
                 column.push(obj);
         })
@@ -160,15 +170,15 @@ Crafty.c('GameManager', {
             x: Math.floor(x),
             y: Math.floor(y)
         });
-        Game.objects.push(obj);
+        this.object.push(obj);
         obj.onCreate();
         return obj;
     },
 
     removeItem: function (item) {
-        var index = Game.objects.indexOf(item);
+        var index = this.object.indexOf(item);
         if (index >= 0) {
-            Game.objects.splice(index, 1);
+            this.object.splice(index, 1);
             this.itemsPool.push(item);
             item.onRemove();
             Game.gameManager.update();
@@ -206,7 +216,7 @@ Crafty.c('GameManager', {
         };
         var column = this.getColumnNumberByScreenPoint(startPoint);
         var self = this;
-        Game.objects.forEach(function(object) {
+        self.object.forEach(function(object) {
             if (self.isObjectOnColumn(column, object)) {
                 object.trigger('MovedVertical', touchVector)
                 object.checkBounds();
@@ -222,7 +232,7 @@ Crafty.c('GameManager', {
 
         var row = this.getRowNumberByScreenPoint(startPoint);
         var self = this;
-        Game.objects.forEach(function(object) {
+        self.object.forEach(function(object) {
             if (self.isObjectOnRow(row, object)) {
                 object.trigger('MovedHorizontal', touchVector)
                 object.checkBounds();
@@ -237,7 +247,7 @@ Crafty.c('GameManager', {
         };
         var column = this.getColumnNumberByScreenPoint(startPoint);
         var self = this;
-        Game.objects.forEach(function(object) {
+        self.object.forEach(function(object) {
             if (self.isObjectOnColumn(column, object)) {
                 object.trigger('StoppedVertical', touchVector)
             }
@@ -251,7 +261,7 @@ Crafty.c('GameManager', {
         };
         var row = this.getRowNumberByScreenPoint(startPoint);
         var self = this;
-        Game.objects.forEach(function(object) {
+        self.object.forEach(function(object) {
             if (self.isObjectOnRow(row, object)) {
                 object.trigger('StoppedHorizontal', touchVector)
             }

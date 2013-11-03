@@ -90,17 +90,6 @@ Crafty.c('Face', {
         return false;
     },
 
-    getNearest: function() {
-        var result = [];
-        var self = this;
-        Game.objects.forEach(function(object) {
-            if (self.isNearest(object)) {
-                result.push(object);
-            }
-        });
-        return result;
-    },
-
     onRemove: function() {
         console.log('Face: onRemove');
         this.tween({

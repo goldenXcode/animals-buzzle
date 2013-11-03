@@ -16,7 +16,6 @@ var Game = {
     scopeView: {},
     level: {},
     sounds: {},
-    objects: []
 };
 
 var AllScripts = [
