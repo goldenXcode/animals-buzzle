@@ -1,13 +1,14 @@
-Crafty.c('FaceSprite', {
+Crafty.c('LockUnitAnimate', {
     init: function() {
         this.requires("2D");
         this.requires("Canvas");
         this.requires("SpriteAnimation");
 
-        this.animalType = rnd(Game.sprites.length);
-        this.requires(Game.sprites[this.animalType]);
+        this.animalType = 999;//rnd(Game.sprites.length);
+        //this.requires(Game.sprites[this.animalType]);
+        this.requires('mouse');
 
-        this.animate("walk_left", 0, 0, 3);
+        /*this.animate("walk_left", 0, 0, 3);
 
         var self = this;
         self.animateTimer = function() {
@@ -16,6 +17,6 @@ Crafty.c('FaceSprite', {
                 self.animateTimer();
             }, rnd(15000) + 4000);
         }
-        self.animateTimer();
+        self.animateTimer();*/
     }
 });

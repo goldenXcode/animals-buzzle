@@ -1,42 +1,45 @@
-Crafty.c('Face', {
+Crafty.c('UnitBehavior', {
     init: function() {
         this.requires("2D");
         this.requires("Canvas");
-        this.requires("FaceSprite");
         this.requires("Tween")
 
         var self = this;
         self.isBusy = false;
+    },
 
-        this.bind("MovedHorizontal", function(e) {
-            //console.log("MovedHorizontal x=" + e.x + ", y=" + e.y);
-            self.shift(Math.floor(e.x), 0);
-            self.busy();
-        });
+    onMoveStopHorizontal: function(e) {
+        //console.log("Stopped x=" + e.x + ", y=" + e.y);
+        this.busy();
+        this.checkStop({
+            x: e.x,
+            y: 0
+        })
+    },
 
-        this.bind("MovedVertical", function(e) {
-            //console.log("MovedVertical x=" + e.x + ", y=" + e.y + ', ' + self.isBusy);
-            self.shift(0, Math.floor(e.y));
-            self.busy();
-        });
+    onMoveStopVertical: function(e) {
+        //console.log("Stopped x=" + e.x + ", y=" + e.y);
+        this.busy();
+        this.checkStop({
+            x: 0,
+            y: e.y
+        })
+    },
 
-        this.bind("StoppedHorizontal", function(e) {
-            //console.log("Stopped x=" + e.x + ", y=" + e.y);
-            self.busy();
-            self.checkStop({
-                x: e.x,
-                y: 0
-            })
-        });
+    isCanMove: function() {
+        return true;
+    },
 
-        this.bind("StoppedVertical", function(e) {
-            //console.log("Stopped x=" + e.x + ", y=" + e.y);
-            self.busy();
-            self.checkStop({
-                x: 0,
-                y: e.y
-            })
-        });
+    onMoveHorizontal: function(e) {
+        //console.log("MovedHorizontal x=" + e.x + ", y=" + e.y);
+        this.shift(Math.floor(e.x), 0);
+        this.busy();
+    },
+    
+    onMoveVertical: function(e) {
+        //console.log("MovedVertical x=" + e.x + ", y=" + e.y + ', ' + self.isBusy);
+        this.shift(0, Math.floor(e.y));
+        this.busy();
     },
 
     getOffsetXForPrecisePosition: function () {
@@ -95,6 +98,8 @@ Crafty.c('Face', {
         this.tween({
             alpha: 0
         }, 10);
+        Settings.scope += 100;
+        Game.scope.update(Settings.scope);
     },
 
     onUpdate: function () {

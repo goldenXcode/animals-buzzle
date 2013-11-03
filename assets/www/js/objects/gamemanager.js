@@ -2,32 +2,19 @@ Crafty.c('GameManager', {
     init: function() {
         this.requires("2D");
         this.requires("Canvas");
+        this.requires("UnitManager");
 
         var self = this;
         Game.gameManager = self;
 
         self.isBusy = false;
-        self.object = [];
-
-        self.itemsPool = new Array();
-        for(var i = 0; i < 100; i++) {
-            console.log('create item in pool: ' + self.itemsPool.length)
-            var obj = Crafty.e("Face").attr({
-                x: 0,
-                y: 0,
-                w: Settings.poligon,
-                h: Settings.poligon,
-                z: 50,
-                alpha: 0
-            });
-            self.itemsPool.push(obj);
-        }
+        self.objects = [];
 
         self.mainTimer = function() {
             setTimeout(function() {
                 self.update();
                 self.mainTimer();
-            }, 1500);
+            }, 500);
         }
         self.mainTimer();
 
@@ -40,10 +27,10 @@ Crafty.c('GameManager', {
     update: function () {
         var self = this;
         if (self.isAllObjectStopped()) {
-            //console.log('All object was stopped!');
+            //console.log('All objects was stopped!');
             if (!self.checkFriends()) {
                 if (!self.gravity()) {
-                    self.object.forEach(function(object) {
+                    self.objects.forEach(function(object) {
                         object.onUpdate();
                     });
                     self.isBusy = false;
@@ -55,7 +42,7 @@ Crafty.c('GameManager', {
     
     getNearestItems: function(obj) {
         var result = [];
-        this.object.forEach(function(object) {
+        this.objects.forEach(function(object) {
             if (obj.isNearest(object)) {
                 result.push(object);
             }
@@ -67,7 +54,7 @@ Crafty.c('GameManager', {
         var result = false;
         var friends = [];
         var self = this;
-        self.object.forEach(function(object) {
+        self.objects.forEach(function(object) {
             var nearest = self.getNearestItems(object);
             if (nearest.length >= 3) {
                 friends = friends.concat(nearest);
@@ -83,7 +70,7 @@ Crafty.c('GameManager', {
     isHasFriends: function() {
         var result = false;
         var self = this;
-        self.object.forEach(function(object) {
+        self.objects.forEach(function(object) {
             var nearest = self.getNearestItems(object);
             if (nearest.length >= 3) {
                 result = true;
@@ -94,7 +81,7 @@ Crafty.c('GameManager', {
 
     isAllObjectStopped: function () {
         var result = true;
-        this.object.forEach(function(object) {
+        this.objects.forEach(function(object) {
             if (object.isBusy) {
                 result = false;
             }
@@ -126,7 +113,7 @@ Crafty.c('GameManager', {
         var y = Settings.bottom - Settings.poligon;
         while (column.length > 0) {
             var item = column.pop();
-            item.trigger('StoppedVertical', {
+            item.onMoveStopVertical({
                 x: 0, 
                 y: Math.floor(y - item.y)
             });
@@ -154,7 +141,7 @@ Crafty.c('GameManager', {
     getColumn: function (columnNumber) {
         var column = [];
         var self = this;
-        self.object.forEach(function(obj) {
+        self.objects.forEach(function(obj) {
             if (self.isObjectOnColumn(columnNumber, obj))
                 column.push(obj);
         })
@@ -163,23 +150,22 @@ Crafty.c('GameManager', {
 
     createItem: function (x, y) {
         console.log('Game.createItem');
-        this.itemsPool.sort(function () { return rnd(2) - 1})
-        var obj = this.itemsPool.pop();
+        var obj = this.popRandom();
 
         obj.attr({
             x: Math.floor(x),
             y: Math.floor(y)
         });
-        this.object.push(obj);
+        this.objects.push(obj);
         obj.onCreate();
         return obj;
     },
 
     removeItem: function (item) {
-        var index = this.object.indexOf(item);
+        var index = this.objects.indexOf(item);
         if (index >= 0) {
-            this.object.splice(index, 1);
-            this.itemsPool.push(item);
+            this.objects.splice(index, 1);
+            this.push(item);
             item.onRemove();
             Game.gameManager.update();
         } else {
@@ -216,9 +202,9 @@ Crafty.c('GameManager', {
         };
         var column = this.getColumnNumberByScreenPoint(startPoint);
         var self = this;
-        self.object.forEach(function(object) {
+        self.objects.forEach(function(object) {
             if (self.isObjectOnColumn(column, object)) {
-                object.trigger('MovedVertical', touchVector)
+                object.onMoveVertical(touchVector);
                 object.checkBounds();
             }
         })
@@ -232,9 +218,9 @@ Crafty.c('GameManager', {
 
         var row = this.getRowNumberByScreenPoint(startPoint);
         var self = this;
-        self.object.forEach(function(object) {
+        self.objects.forEach(function(object) {
             if (self.isObjectOnRow(row, object)) {
-                object.trigger('MovedHorizontal', touchVector)
+                object.onMoveHorizontal(touchVector);
                 object.checkBounds();
             }
         })
@@ -247,9 +233,9 @@ Crafty.c('GameManager', {
         };
         var column = this.getColumnNumberByScreenPoint(startPoint);
         var self = this;
-        self.object.forEach(function(object) {
+        self.objects.forEach(function(object) {
             if (self.isObjectOnColumn(column, object)) {
-                object.trigger('StoppedVertical', touchVector)
+                object.onMoveStopVertical(touchVector);
             }
         })
     },
@@ -261,10 +247,46 @@ Crafty.c('GameManager', {
         };
         var row = this.getRowNumberByScreenPoint(startPoint);
         var self = this;
-        self.object.forEach(function(object) {
+        self.objects.forEach(function(object) {
             if (self.isObjectOnRow(row, object)) {
-                object.trigger('StoppedHorizontal', touchVector)
+                object.onMoveStopHorizontal(touchVector);
             }
         })
     },
+
+    isCanMoveVertical: function(touchVector) {
+        console.log('GameManager: isCanMoveVertical');
+        var result = true;
+        var startPoint = {
+            x: touchVector.startX,
+            y: touchVector.startY,
+        };
+        var column = this.getColumnNumberByScreenPoint(startPoint);
+        var self = this;
+        self.objects.forEach(function(object) {
+            if (self.isObjectOnColumn(column, object)) {
+                if (!object.isCanMove())
+                    result = false;
+            }
+        })
+        return result;
+    },
+
+    isCanMoveHorizontal: function(touchVector) {
+        console.log('GameManager: isCanMoveHorizontal');
+        var result = true;
+        var startPoint = {
+            x: touchVector.startX,
+            y: touchVector.startY,
+        };
+        var row = this.getRowNumberByScreenPoint(startPoint);
+        var self = this;
+        self.objects.forEach(function(object) {
+            if (self.isObjectOnRow(row, object)) {
+                if (!object.isCanMove())
+                    result = false;
+            }
+        })
+        return result;
+    }
 });

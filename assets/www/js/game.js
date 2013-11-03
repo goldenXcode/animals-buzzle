@@ -14,20 +14,26 @@ var Settings = {
 
 var Game = {
     scopeView: {},
+    scope: {},
     level: {},
     sounds: {},
 };
 
 var AllScripts = [
     // objects
-    'js/objects/face',
+    'js/objects/unit',
+    'js/objects/unitbehavior',
+    'js/objects/unitanimate',
+    'js/objects/unitmanager',
     'js/objects/touchmanager',
+    'js/objects/lockunit',
+    'js/objects/lockunitanimate',
     'js/objects/gamemanager',
-    'js/objects/facesprite',
     'js/objects/background',
     'js/objects/frontground',
     'js/objects/zabor',
     'js/objects/grass',
+    'js/objects/scope',
     // scenes
     'js/scenes/loading',
     'js/scenes/main',
@@ -81,6 +87,10 @@ require(AllScripts, function() {
     });
     Crafty.sprite(258, 78, "images/grass.png", {
         grass: [0,0]
+    });
+    // подгружаем спрайт
+    Crafty.sprite(Settings.poligon, "images/mouse.png", {
+        mouse: [0,0]
     });
 
     Game.sprites = [

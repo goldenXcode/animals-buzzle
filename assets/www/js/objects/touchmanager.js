@@ -113,6 +113,7 @@ Crafty.c('TouchManager', {
 
     startMotion: function (e) {
         var self = this;
+
         self.attr({
             lastPos: {
                 x: e.x, 
@@ -127,7 +128,7 @@ Crafty.c('TouchManager', {
         self.inMotion = true;
     },
 
-    motion: function (e) {         
+    motion: function (e) {  
         var self = this;
         if (!self.inMotion)        
             throw "Can't move without begin called!"
@@ -135,6 +136,24 @@ Crafty.c('TouchManager', {
         var dy = e.y - self.lastPos.y;
 
         self.checkDirection(e);
+
+        var startPoint = {
+            x: dx, 
+            y: dy,
+            startX: self.startPos.x,
+            startY: self.startPos.y
+        };
+        if (self.direction == 'Vertical') {
+            if (!Game.gameManager.isCanMoveVertical(startPoint)) {
+                self.stop(e);
+                return;
+            }
+        } else {
+            if (!Game.gameManager.isCanMoveHorizontal(startPoint)) {
+                self.stop(e);
+                return;
+            }
+        }
 
         self.attr({
             lastPos: {

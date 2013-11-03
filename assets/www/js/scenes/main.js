@@ -10,6 +10,7 @@ Crafty.scene("main", function() {
     //Crafty.e("Frontground");
     Crafty.e("TouchManager");
     Crafty.e("GameManager");
+    Crafty.e("Scope");
 
     for(var i = 0; i*Settings.poligon < Settings.width; i++) {
         console.log("Main scene ground")

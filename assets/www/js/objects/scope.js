@@ -5,10 +5,12 @@ Crafty.c('Scope', {
 
         this.attr({x: 0, y: 0, z: 1, w: 200, h: 100, scope: Settings.scope});
 
+        Game.scope = this;
+
         this.text = Crafty.e("2D, DOM, Text")
             .attr({w: this.w, h: this.h, x: this.x, y: this.y})
             .textFont({ size: '24px'})
-            .text("Scope: " + this.scope)
+            .text(this.getString())
             .textColor('#FFFFFF', 1)
             .css({"text-align": "left"});
 
@@ -25,7 +27,7 @@ Crafty.c('Scope', {
     },
 
     getString: function() {
-        return "Scope: " + Math.round(this.scope);
+        return Math.round(this.scope);
     }
 
 });
