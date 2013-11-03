@@ -11,12 +11,25 @@ Crafty.c('GameManager', {
         Game.gameManager = self;
 
         self.isBusy = false;
+        self.itemsPool = new Array();
+        for(var i = 0; i < 100; i++) {
+            console.log('create item in pool: ' + self.itemsPool.length)
+            var obj = Crafty.e("Face").attr({
+                x: 0,
+                y: 0,
+                w: Settings.poligon,
+                h: Settings.poligon,
+                z: 50,
+                alpha: 0
+            });
+            self.itemsPool.push(obj);
+        }
 
         self.mainTimer = function() {
             setTimeout(function() {
                 self.update();
                 self.mainTimer();
-            }, 500);
+            }, 1500);
         }
         self.mainTimer();
 
@@ -32,6 +45,9 @@ Crafty.c('GameManager', {
             //console.log('All object was stopped!');
             if (!self.checkFriends()) {
                 if (!self.gravity()) {
+                    Game.objects.forEach(function(object) {
+                        object.onUpdate();
+                    });
                     self.isBusy = false;
                     //console.log('Reset gameManager state');
                 }
@@ -41,14 +57,16 @@ Crafty.c('GameManager', {
     
     checkFriends: function() {
         var result = false;
+        var friends = [];
         Game.objects.forEach(function(object) {
             var nearest = object.getNearest();
             if (nearest.length >= 3) {
-                nearest.forEach(function (obj) {
-                    obj.remove();
-                })
+                friends = friends.concat(nearest);
                 result = true;
             }
+        })
+        friends.forEach(function (obj) {
+            Game.gameManager.removeItem(obj);
         })
         return result;
     },
@@ -78,9 +96,10 @@ Crafty.c('GameManager', {
         var self = this;
         var result = false;
 
+        var columnNumber = 0;
         var x = Settings.left;
         while (x < Settings.right) {
-            var column = self.getColumn(x);
+            var column = self.getColumn(columnNumber);
 
             if (column.length < 6) {
                 result = true;
@@ -88,28 +107,27 @@ Crafty.c('GameManager', {
                 self.dropItemsFromColumn(column, x);
             }
             x += Settings.poligon;
+            columnNumber += 1;
         }
         return result;
     },
 
     dropItemsFromColumn: function(column) {
         var y = Settings.bottom - Settings.poligon;
-        while (y >= Settings.top) {
+        while (column.length > 0) {
             var item = column.pop();
-            if (item) {
-                item.trigger('StoppedVertical', {
-                    x: 0, 
-                    y: y - item.y
-                });
-            }
+            item.trigger('StoppedVertical', {
+                x: 0, 
+                y: Math.floor(y - item.y)
+            });
             y -= Settings.poligon;
         }
     },
 
     fillColumn: function(column, x) {
         var self = this;
-        var y = Settings.top - Settings.poligon;
-        while (column.length < 6) {
+        var y = - Settings.poligon;
+        while (column.length < 6) {//FIXME: bad condition
             var item = self.createItem(x, y);
             column.push(item);
             y -= Settings.poligon;
@@ -123,26 +141,27 @@ Crafty.c('GameManager', {
         });
     },
 
-    getColumn: function (x) {
+    getColumn: function (columnNumber) {
         var column = [];
+        var self = this;
         Game.objects.forEach(function(obj) {
-            if (obj.x == x)
+            if (self.isObjectOnColumn(columnNumber, obj))
                 column.push(obj);
         })
         return column;
     },
 
     createItem: function (x, y) {
-        console.log('Game.createItem')
-        var obj = Crafty.e("Face").attr({
-            x: x,
-            y: y,
-            w: Settings.poligon,
-            h: Settings.poligon,
-            z: 50
-        });
+        console.log('Game.createItem');
+        this.itemsPool.sort(function () { return rnd(2) - 1})
+        var obj = this.itemsPool.pop();
 
+        obj.attr({
+            x: Math.floor(x),
+            y: Math.floor(y)
+        });
         Game.objects.push(obj);
+        obj.onCreate();
         return obj;
     },
 
@@ -150,6 +169,11 @@ Crafty.c('GameManager', {
         var index = Game.objects.indexOf(item);
         if (index >= 0) {
             Game.objects.splice(index, 1);
+            this.itemsPool.push(item);
+            item.onRemove();
+            Game.gameManager.update();
+        } else {
+            console.log('FUCK! item.alpha=' + item.alpha);
         }
     },
 

@@ -65,6 +65,7 @@ Crafty.c('Face', {
                     y: Math.floor(self.y - dy)
                 }, 2)
             } else {
+                self.unbind('TweenEnd');
                 self.isBusy = false;
                 Game.gameManager.update();
             }
@@ -100,15 +101,25 @@ Crafty.c('Face', {
         return result;
     },
 
-    remove: function() {
-        var obj = this;
-        obj.busy();
-        obj.bind('TweenEnd', function() {
-            Game.gameManager.removeItem(obj);           
+    onRemove: function() {
+        console.log('Face: onRemove');
+        this.tween({
+            alpha: 0
+        }, 10);
+    },
+
+    onUpdate: function () {
+        this.attr({
+            alpha: 1
         });
-        obj.tween({
-            alpha: 0.0
-        }, 20);
+    },
+
+    onCreate: function() {
+        console.log('Face: onCreate');
+        this.attr({
+            alpha: 1.0
+        });
+        this.isBusy = false;
     },
 
     checkBounds: function () {
