@@ -34,6 +34,7 @@ var AllScripts = [
     'js/objects/zabor',
     'js/objects/grass',
     'js/objects/scope',
+    'js/objects/levelsmanager.js',
     // scenes
     'js/scenes/loading',
     'js/scenes/main',
@@ -75,9 +76,20 @@ require(AllScripts, function() {
     Crafty.sprite(Settings.poligon, "images/pig.png", {
         pig: [0,0]
     });
+    // подгружаем спрайт
+    Crafty.sprite(Settings.poligon, "images/mouse.png", {
+        mouse: [0,0]
+    });
+    // подгружаем спрайт
+    Crafty.sprite(Settings.poligon, "images/cat.png", {
+        cat: [0,0]
+    });
 
     Crafty.sprite(Settings.poligon, "images/sky.png", {
         background: [0,0]
+    });
+    Crafty.sprite(Settings.poligon, "images/sign.png", {
+        sign: [0,0]
     });
     Crafty.sprite("images/skyframe.png", {
         frontgroundimg: [0,0]
@@ -88,10 +100,6 @@ require(AllScripts, function() {
     Crafty.sprite(258, 78, "images/grass.png", {
         grass: [0,0]
     });
-    // подгружаем спрайт
-    Crafty.sprite(Settings.poligon, "images/mouse.png", {
-        mouse: [0,0]
-    });
 
     Game.sprites = [
         'bear',
@@ -99,7 +107,9 @@ require(AllScripts, function() {
         'bug',
         'rabbit',
         'pig',
-        'frog'
+        'frog',
+        'mouse',
+        'cat'
     ]
 
     var isPhoneGapUse = false;

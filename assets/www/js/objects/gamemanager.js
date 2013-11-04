@@ -288,5 +288,5 @@ Crafty.c('GameManager', {
             }
         })
         return result;
-    }
+    },
 });

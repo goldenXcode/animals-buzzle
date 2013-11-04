@@ -4,8 +4,4 @@ Crafty.c('Unit', {
         this.requires("UnitAnimate");
     },
 
-    isCanMove: function() {
-        return false;
-    },
-
 });

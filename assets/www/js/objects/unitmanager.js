@@ -40,5 +40,15 @@ Crafty.c('UnitManager', {
 
     push: function(object) {
         this.itemsPool.push(object);
-    }
+    },
+
+    countSameObjectsInPool: function(objectTypeId) {
+        var self = this;
+        var count = 0;
+        self.itemsPool.forEach(function(object) {
+            if (object.type == objectTypeId)
+                count++;
+        });
+        return count;
+    },
 });
